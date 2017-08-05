@@ -9,8 +9,7 @@ import json, requests
 
 # Import the values from the configuration file
 with open("config.json") as config_file:
-	fixed_json = ''.join(line for line in config_file if not line.startswith('	//')) # Remove comments from JSON
-	config = json.loads(fixed_json) # Convert JSON to Python
+	config = json.load(config_file) # Convert JSON to Python
 
 domain = config["domain"]
 api_key = config["api_key"]
