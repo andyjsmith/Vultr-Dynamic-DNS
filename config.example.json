@@ -1,0 +1,20 @@
+{
+	// Generate an API key under the Account->API page.
+	// Under "Access Control", you need to click "Allow All IPv4".
+	// This is required because if you had a static IP you wanted to allow,
+	// you would not be using this DDNS service in the first place.
+	"api_key": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+
+	// The domain you want to use listed under the DNS tab in Vultr.
+	"domain": "example.com",
+
+	// Add the name(s) of the dynamic record(s) you want to update.
+	// Vultr only uses the subdomain for this list.
+	// For example, abc.example.com would be "abc".
+	// If you want to use the base domain, use an empty string "".
+	"dynamic_records": [
+		"",
+		"test",
+		"123"
+	]
+}
