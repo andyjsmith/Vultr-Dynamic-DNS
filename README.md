@@ -9,7 +9,7 @@ If you want to map an A record in Vultr's DNS to a local machine but you aren't 
     - [Linux](http://python-guide-pt-br.readthedocs.io/en/latest/starting/install3/linux/)
     - [Mac OSX](http://python-guide-pt-br.readthedocs.io/en/latest/starting/install3/osx/)
     - [Windows](http://python-guide-pt-br.readthedocs.io/en/latest/starting/install3/win/)
-- Clone this repository: `git clone https://github.com/andyjsmith/Vultr-Dynamic-DNS.git vultrddns && cd vultrdns`
+- Clone this repository: `git clone https://github.com/andyjsmith/Vultr-Dynamic-DNS.git vultrddns && cd vultrddns`
 - Create a config.json file `mv config.template.json config.json`
 - Read the intructions in config.json.example for how to fill out the config.json. You will need to generate an API key in Vultr. It is important to click "Allow All IPv4".
 - Test the script and configuration: `python3 ddns.py`. If there aren't any errors, the setup is complete.
