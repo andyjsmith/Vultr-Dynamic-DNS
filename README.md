@@ -18,7 +18,7 @@ After completing the basic setup, it is important to set up a recurring task as 
 ### Linux & Mac OSX
 - Find the full path of the ddns.py file using `realpath ddns.py`
 - Run `crontab -e`
-- Add the following line to the end of the file, adding in the real path to the ddns.py file: `*/30 * * * * python3 [full path to ddns.py] > /dev/null 2>&1`. This will run the script every 30 minutes and redirect all of its output to /dev/null.
+- Add the following line to the end of the file, adding in the real path to the ddns.py file: `*/30 * * * * cd [full path to ddns.py] && python3 ddns.py > /dev/null 2>&1`. This will run the script every 30 minutes and redirect all of its output to /dev/null.
 - Save and quit out of the text editor. The crontab file will automatically be install and your IP will now automatically be updated.
 ### Windows
 Create a task in Task Scheduler to run every 30 minutes.
