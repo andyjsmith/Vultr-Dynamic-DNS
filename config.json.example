@@ -17,4 +17,16 @@
 		"test",
 		"123"
 	]
+	
+	//If you want to update multiple/additional domains then please add the following block
+	,
+	"domain": "example2.com",
+	
+	"dynamic_records": 
+		[
+		"",
+		"test",
+		"123"
+		]
+	
 }
