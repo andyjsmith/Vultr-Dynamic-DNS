@@ -17,4 +17,16 @@
 		"test",
 		"123"
 	]
+	
+	// If you want to change addional domains, you can add the following
+	,
+	"domain": "example2.com",
+
+	"dynamic_records": [
+		"",
+		"test",
+		"123"
+	]
+	
+	
 }
