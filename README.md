@@ -13,6 +13,9 @@ If you want to map an A record in Vultr's DNS to a local machine but you aren't 
 - Fill out config.json. Read the intructions in config.json.example, you will need to generate an API key in Vultr. It is important to click "Allow All IPv4".
 - Test the script and configuration: `python3 ddns.py`. If there aren't any errors, the setup is complete.
 
+## Known Issues
+- If you get an error stating your IP is not authorized, you must go to your Vultr account, click on your name in the top right and click API. You can then go to Access Control and click "Allow All IPv4" and/or "Allow All IPv6", or manually specify your IP. This step is important as IPv6 may not be enabled by default but some computers will communicate on IPv6 by default.
+
 # Automation
 After completing the basic setup, it is important to set up a recurring task as the script does not do this by default.
 ### Linux & Mac OSX

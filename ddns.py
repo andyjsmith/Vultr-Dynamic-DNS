@@ -5,7 +5,9 @@ https://ajsmith.us/
 https://github.com/andyjsmith/Vultr-Dynamic-DNS
 '''
 
-import json, requests
+import json
+import sys
+import requests
 
 # Import the values from the configuration file
 with open("config.json") as config_file:
@@ -16,10 +18,23 @@ api_key = config["api_key"]
 dynamic_records = config["dynamic_records"]
 
 # Get the public IP of the server
-ip = requests.get("https://ip.42.pl/raw").text
+ip = requests.get("https://api.ipify.org").text
 
 # Get the list of DNS records from Vultr to translate the record name to recordid
-raw_records = json.loads(requests.get("https://api.vultr.com/v1/dns/records?domain=" + domain, headers={"API-Key": api_key}).text)
+raw_response = requests.get("https://api.vultr.com/v1/dns/records?domain=" + domain, headers={"API-Key": api_key}).text
+if "is not authorized" in raw_response:
+    print("There was an error. You are not authorized to use the API. Details are below.")
+    print("NOTE: If using IPv6, or an IPv6 address is displayed below, you need to go to your account API settings and click Allow all IPv6.")
+    print("Error returned from Vultr API:")
+    print(raw_response)
+    sys.exit(1)
+
+try:
+    raw_records = json.loads(raw_response)
+except json.decoder.JSONDecodeError:
+    print("Error returned from Vultr API:")
+    print(raw_response)
+    sys.exit(1)
 
 # Filter out other records besides A records
 records = []
