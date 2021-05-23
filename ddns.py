@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 Dynamic DNS service for Vultr
 By Andy Smith
