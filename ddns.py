@@ -20,21 +20,28 @@ dynamic_records = config["dynamic_records"]
 # Get the public IP of the server
 ip = requests.get("https://api.ipify.org").text
 
+response = requests.get("https://api.vultr.com/v2/domains/{}/records?per_page=500".format(domain), headers={"Authorization": "Bearer " + api_key})
+
 # Get the list of DNS records from Vultr to translate the record name to recordid
-raw_response = requests.get("https://api.vultr.com/v2/domains/{}/records?per_page=500".format(domain), headers={"Authorization": "Bearer " + api_key}).text
+raw_response = response.text
 if "is not authorized" in raw_response:
-    print("There was an error. You are not authorized to use the API. Details are below.")
-    print("NOTE: If using IPv6, or an IPv6 address is displayed below, you need to go to your account API settings and click Allow all IPv6.")
-    print("Error returned from Vultr API:")
-    print(raw_response)
-    sys.exit(1)
+	print("There was an error. You are not authorized to use the API. Details are below.")
+	print("NOTE: If using IPv6, or an IPv6 address is displayed below, you need to go to your account API settings and click Allow all IPv6.")
+	print("Error returned from Vultr API:")
 
 try:
-    raw_records = json.loads(raw_response)
+	response.raise_for_status()
+except requests.HTTPError:
+	print("Error returned from Vultr API:")
+	print(raw_response)
+	sys.exit(1)
+
+try:
+	raw_records = json.loads(raw_response)
 except json.decoder.JSONDecodeError:
-    print("Error returned from Vultr API:")
-    print(raw_response)
-    sys.exit(1)
+	print("Error returned from Vultr API:")
+	print(raw_response)
+	sys.exit(1)
 
 # Filter out other records besides A records
 records = []
