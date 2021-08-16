@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 Dynamic DNS service for Vultr
 By Andy Smith
@@ -8,6 +9,7 @@ https://github.com/andyjsmith/Vultr-Dynamic-DNS
 import json
 import sys
 import requests
+import warnings
 
 # Import the values from the configuration file
 with open("config.json") as config_file:
@@ -19,6 +21,11 @@ dynamic_records = config["dynamic_records"]
 
 # Get the public IP of the server
 ip = requests.get("https://api.ipify.org").text
+try:
+	ipv6 = requests.get("https://api6.ipify.org").text
+except requests.ConnectionError as e:
+	warnings.warn(f'Couldn\'t get IPv6 address: {str(e)}')
+	ipv6 = None
 
 response = requests.get("https://api.vultr.com/v2/domains/{}/records?per_page=500".format(domain), headers={"Authorization": "Bearer " + api_key})
 
@@ -43,40 +50,50 @@ except json.decoder.JSONDecodeError:
 	print(raw_response)
 	sys.exit(1)
 
-# Filter out other records besides A records
-records = []
-for record in raw_records["records"]:
-	if record["type"] == "A":
-		records.append(record)
+def get_records_to_change(record_type, ip):
+	# Filter out other records besides A/AAAA records
+	records_to_check = [
+		record
+		for record in raw_records["records"]
+		if record["type"] == record_type and record["name"] in dynamic_records
+	]
 
-# Make a new array of the IDs from the records in the config file
-records_to_change = []
-for record in records:
-	if record["name"] in dynamic_records:
-		records_to_change.append(record)
+	records_to_change = [
+		record
+		for record in records_to_check
+		if record["data"] != ip
+	]
+
+	for record in records_to_change:
+		record["new_ip"] = ip
+
+	return records_to_check, records_to_change
+
+check_ipv4, change_ipv4 = get_records_to_change("A", ip)
+check_ipv6, change_ipv6 = get_records_to_change("AAAA", ipv6) if ipv6 is not None else ([], [])
 
 # Cancel if no records from Vultr match the config file
-if len(records_to_change) == 0:
+if len(check_ipv4+check_ipv6) == 0:
 	print("Configuration error, no records to change.")
 	sys.exit(1)
 
-# Check if the IP address actually differs from any of the records
-needsUpdated = False
-for record in records_to_change:
-	if record["data"] != ip:
-		needsUpdated = True
-
-# Cancel if the IP has not changed
-if not needsUpdated:
+records_to_change = change_ipv4 + change_ipv6
+if len(records_to_change) == 0:
 	print("IP address has not changed. No records have been updated.")
-	sys.exit(1)
+	sys.exit(0)
+
+changes = sorted(set(
+	(record["data"], record["new_ip"])
+	for record in records_to_change
+))
 
 print("IP has changed since last checking.")
-print("Old IP on Vultr: " + records_to_change[0]["data"] + ", current server IP: " + ip)
+for old_ip, new_ip in changes:
+	print(f"Old IP on Vultr: {old_ip}, current server IP: {new_ip}")
 
 # Update the records in Vultr with the new IP address
 for record in records_to_change:
-	payload = {"data": ip}
+	payload = {"data": record["new_ip"]}
 	response = requests.patch("https://api.vultr.com/v2/domains/{}/records/{}".format(domain, record["id"]), json=payload, headers={"Authorization": "Bearer " + api_key})
 	name = record["name"]
 	if name == "":
@@ -85,4 +102,4 @@ for record in records_to_change:
 		print("Error returned from Vultr API:")
 		print(response.text)
 	else:
-		print("Changed " + name + " (" + str(record["id"]) + ") to " + ip + " in " + domain)
+		print(f"Changed {name}/{record['type']} ({record['id']}) to {record['new_ip']} in {domain}")
