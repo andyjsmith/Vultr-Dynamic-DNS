@@ -9,7 +9,6 @@ https://github.com/andyjsmith/Vultr-Dynamic-DNS
 import json
 import sys
 import requests
-import warnings
 
 # Import the values from the configuration file
 with open("config.json") as config_file:
@@ -24,7 +23,7 @@ ip = requests.get("https://ip4.seeip.org").text
 try:
 	ipv6 = requests.get("https://ip6.seeip.org", timeout=10).text
 except (requests.ConnectionError, requests.exceptions.Timeout) as e:
-	warnings.warn(f'Couldn\'t get IPv6 address: {str(e)}')
+	print(f'Couldn\'t get IPv6 address, using IPv4 only.')
 	ipv6 = None
 
 response = requests.get("https://api.vultr.com/v2/domains/{}/records?per_page=500".format(domain), headers={"Authorization": "Bearer " + api_key})
