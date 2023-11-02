@@ -19,9 +19,9 @@ api_key = config["api_key"]
 dynamic_records = config["dynamic_records"]
 
 # Get the public IP of the server
-ip = requests.get("https://ip4.seeip.org").text
+ip = requests.get("https://ipv4.seeip.org").text
 try:
-	ipv6 = requests.get("https://ip6.seeip.org", timeout=10).text
+	ipv6 = requests.get("https://ipv6.seeip.org", timeout=10).text
 except (requests.ConnectionError, requests.exceptions.Timeout) as e:
 	print(f'Couldn\'t get IPv6 address, using IPv4 only.')
 	ipv6 = None
